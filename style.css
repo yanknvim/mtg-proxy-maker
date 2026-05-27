@@ -8,12 +8,15 @@
   --border: #d7dce5;
   --success: #1f9d57;
   --warning: #f59f00;
+  --error: #c92a2a;
   --radius: 16px;
   --code-bg: #eef1f6;
   --policy-bg: #f8f9fc;
   --preview-bg: #fafbff;
   --gradient-start: #f0f3ff;
   --progress-bg: #e9ecef;
+  --badge-border: #c3d0ff;
+  --card-shadow: 0 12px 32px rgba(31, 36, 48, 0.05);
 }
 
 [data-theme="dark"] {
@@ -26,11 +29,14 @@
   --border: #363d4d;
   --success: #40c987;
   --warning: #ffc04d;
+  --error: #ff6b6b;
   --code-bg: #2a2f3d;
   --policy-bg: #1e2230;
   --preview-bg: #1e2230;
   --gradient-start: #161921;
   --progress-bg: #363d4d;
+  --badge-border: #3d5afe;
+  --card-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
 }
 
 * {
@@ -92,7 +98,7 @@ body {
   color: var(--accent);
   font-weight: 600;
   font-size: 0.95rem;
-  border: 1px solid #c3d0ff;
+  border: 1px solid var(--badge-border);
 }
 
 .theme-toggle {
@@ -147,7 +153,8 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 24px;
-  box-shadow: 0 12px 32px rgba(31, 36, 48, 0.05);
+  box-shadow: var(--card-shadow);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .policy-card h2,
@@ -195,6 +202,8 @@ body {
 
 textarea {
   width: 100%;
+  background: var(--surface);
+  color: var(--text);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 14px;
@@ -202,7 +211,11 @@ textarea {
   font-size: 1rem;
   line-height: 1.6;
   resize: vertical;
-  transition: border 0.2s ease;
+  transition: border 0.2s ease, background 0.3s ease, color 0.3s ease;
+}
+
+textarea::placeholder {
+  color: var(--muted);
 }
 
 textarea:focus {
@@ -306,7 +319,7 @@ button:disabled {
 }
 
 .status.error {
-  color: #c92a2a;
+  color: var(--error);
 }
 
 .status.success {
@@ -383,9 +396,27 @@ button:disabled {
 
 .footer {
   text-align: center;
-  color: var(--muted);
   font-size: 0.92rem;
   line-height: 1.6;
+  padding-top: 8px;
+}
+
+.footer-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.footer-notice {
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+
+.footer .policy-details {
+  text-align: left;
 }
 
 @media (max-width: 720px) {

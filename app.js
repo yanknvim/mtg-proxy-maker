@@ -12,13 +12,46 @@ const downloadButton = document.getElementById("downloadButton");
 const statusMessage = document.getElementById("statusMessage");
 const previewGrid = document.getElementById("previewGrid");
 const previewPlaceholder = document.getElementById("previewPlaceholder");
+const progressContainer = document.getElementById("progressContainer");
+const progressFill = document.getElementById("progressFill");
+const progressText = document.getElementById("progressText");
+const themeToggle = document.getElementById("themeToggle");
 
 previewButton.addEventListener("click", () => buildPreview());
 downloadButton.addEventListener("click", () => downloadPdf());
+themeToggle.addEventListener("click", () => toggleTheme());
+
+// テーマ初期化
+function initTheme() {
+  const savedTheme = localStorage.getItem("theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  themeToggle.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme");
+  const next = current === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("theme", next);
+  themeToggle.textContent = next === "dark" ? "☀️" : "🌙";
+}
+
+initTheme();
 
 function setStatus(text, type = "info") {
   statusMessage.textContent = text;
   statusMessage.className = `status ${type}`;
+}
+
+function setProgress(percent, text) {
+  progressContainer.classList.remove("hidden");
+  progressFill.style.width = `${percent}%`;
+  progressText.textContent = text || `${Math.round(percent)}%`;
+}
+
+function hideProgress() {
+  progressContainer.classList.add("hidden");
+  progressFill.style.width = "0%";
 }
 
 function parseDecklist(text) {
@@ -214,18 +247,24 @@ function downloadPdf() {
 
   (async () => {
     try {
-      for (const card of state.cards) {
-        // eslint-disable-next-line no-await-in-loop
-        await drawCard(card);
+      const total = state.cards.length;
+      setProgress(0, `0 / ${total} 枚`);
+
+      for (let i = 0; i < total; i++) {
+        await drawCard(state.cards[i]);
+        const percent = ((i + 1) / total) * 100;
+        setProgress(percent, `${i + 1} / ${total} 枚`);
       }
 
       const blob = pdf.output("blob");
       revokePdfUrl();
       state.pdfBlobUrl = URL.createObjectURL(blob);
       triggerDownload(state.pdfBlobUrl, "mtg-proxy.pdf");
-      setStatus(`PDFを生成しました（${pages} ページ / ${state.cards.length} 枚）。`, "success");
+      hideProgress();
+      setStatus(`PDFを生成しました（${pages} ページ / ${total} 枚）。`, "success");
     } catch (error) {
       console.error("PDF生成に失敗:", error);
+      hideProgress();
       setStatus(`PDF生成に失敗しました: ${error.message}`, "error");
     }
   })();

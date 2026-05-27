@@ -282,6 +282,7 @@ function triggerDownload(url, filename) {
 async function loadImageAsDataURL(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
+    img.crossOrigin = "anonymous";
     img.onload = () => {
       const canvas = document.createElement("canvas");
       canvas.width = img.naturalWidth;

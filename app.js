@@ -280,15 +280,18 @@ function triggerDownload(url, filename) {
 }
 
 async function loadImageAsDataURL(url) {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`画像取得に失敗 (${response.status})`);
-  }
-  const blob = await response.blob();
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
-    reader.readAsDataURL(blob);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/jpeg", 0.92));
+    };
+    img.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
+    img.src = url;
   });
 }
